@@ -2,43 +2,16 @@ from flask import Flask, render_template,request,redirect,send_from_directory,ur
 import numpy as np
 import json
 import uuid
+import tensorflow as tf
 import os
 import requests
 from dotenv import load_dotenv
 from pesticides_data import PESTICIDES_DATA
-from PIL import Image
 
 load_dotenv()
 
 app = Flask(__name__)
-
-# Dual-inference configuration: prefer tflite to fit within 512MB RAM constraints on Render Free Tier
-USE_TFLITE = False
-try:
-    import tflite_runtime.interpreter as tflite
-    USE_TFLITE = True
-    print("Using lightweight tflite-runtime.")
-except ImportError:
-    try:
-        import tensorflow.lite as tflite
-        USE_TFLITE = True
-        print("Using tensorflow.lite.")
-    except ImportError:
-        try:
-            import tensorflow as tf
-            USE_TFLITE = False
-            print("Using full tensorflow.")
-        except ImportError:
-            print("Warning: Neither tensorflow nor tflite-runtime found.")
-
-if USE_TFLITE:
-    model_path = "models/plant_disease_recog_model_pwp.tflite"
-    interpreter = tflite.Interpreter(model_path=model_path)
-    interpreter.allocate_tensors()
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
-else:
-    model = tf.keras.models.load_model("models/plant_disease_recog_model_pwp.keras")
+model = tf.keras.models.load_model("models/plant_disease_recog_model_pwp.keras")
 label = ['Apple___Apple_scab',
  'Apple___Black_rot',
  'Apple___Cedar_apple_rust',
@@ -92,28 +65,15 @@ def uploaded_images(filename):
 def home():
     return render_template('home.html')
 
-def extract_features_tflite(image_path):
-    img = Image.open(image_path).resize((160, 160))
-    feature = np.array(img, dtype=np.float32)
-    feature = np.expand_dims(feature, axis=0)
-    return feature
-
 def extract_features(image):
-    import tensorflow as tf
     image = tf.keras.utils.load_img(image,target_size=(160,160))
     feature = tf.keras.utils.img_to_array(image)
     feature = np.array([feature])
     return feature
 
 def model_predict(image):
-    if USE_TFLITE:
-        img = extract_features_tflite(image)
-        interpreter.set_tensor(input_details[0]['index'], img)
-        interpreter.invoke()
-        prediction = interpreter.get_tensor(output_details[0]['index'])
-    else:
-        img = extract_features(image)
-        prediction = model.predict(img)
+    img = extract_features(image)
+    prediction = model.predict(img)
     prediction_label = plant_disease[prediction.argmax()]
     return prediction_label
 
