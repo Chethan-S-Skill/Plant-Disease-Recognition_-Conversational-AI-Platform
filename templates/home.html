@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Disease Recognition</title>
+    <link rel="icon" href="../static/images/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <img src="../static/images/logo.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
+            PHASAL
+          </a>
+          <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Features</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Pricing</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+              </li>
+            </ul>
+          </div> -->
+        </div>
+      </nav>
+      <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner " >
+            <div class="carousel-item active">
+              <div class="carousel-text-wrapper">
+                <h1 class="carousel-text-title">Plant Disease Recognition</h1>
+                <div class="form-box">
+                  <form action="/upload/" method = "POST" enctype="multipart/form-data">
+                    <h1>Upload Image</h1>
+                    <div class="input-box d-flex">
+                      <input type="file"  accept="image/png, image/jpeg"  name="img" required>
+                    </div>
+                    <div class="input-box d-flex">
+                      <button type="submit" class="btn btn-success m-auto">Upload</button>
+                    </div>
+                  </form>
+                  {% if result %}
+                  <div class="result-container">
+                    <div class="result-box">
+                      <div class="result-img-container">
+                        <!-- <img src="../static/images/Apple_tree_leaf.jpg" alt="uploaded image" class="result-image"> -->
+                        <img src="{{imagepath}}" alt="uploaded image" class="result-image">
+                      </div>
+                      <div class="result-text">
+                        <h3>                   
+                          {{prediction['name']}}
+                        </h3>
+                        <p>
+                          {{prediction['cause']}}
+                        </p>
+                        <p>
+                          {{prediction['cure']}}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+                </div>
+                
+                
+                <!-- <div class="m-auto text-center">
+                  <h1>फसल karo Hustle नहीं</h1>
+                  <h3 class="hero-subhead">Lorem ipsum dolor sit amet, consectetur adipiscing elit,</h3>
+                </div> -->
+              </div>
+              
+            </div>
+           
+        </div>
+       
+      </div>
+
+      <!-- Floating AI Chatbot -->
+      <div class="crop-chatbot-container">
+        <!-- Floating Toggle Button -->
+        <button id="chatbot-toggle-btn" class="chatbot-trigger" aria-label="Open Crop Chatbot">
+          <div class="trigger-icon-wrapper">
+            <!-- leaf-speech svg icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chat-icon-svg">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              <path d="M12 8l-2 2h4l-2 2"></path>
+            </svg>
+            <span class="chat-notification-badge" id="chat-badge" style="display: none;">1</span>
+          </div>
+        </button>
+
+        <!-- Chat Panel Window -->
+        <div id="chatbot-window" class="chatbot-window-panel d-none">
+          <!-- Chat Window Header -->
+          <div class="chatbot-header">
+            <div class="chatbot-brand">
+              <div class="chatbot-avatar-glow">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <div class="chatbot-meta">
+                <span class="chatbot-name">Phasal Crop Care AI</span>
+                <span class="chatbot-status" id="chatbot-status"><span class="status-dot"></span>Checking AI...</span>
+              </div>
+            </div>
+            <button id="chatbot-close-btn" class="chatbot-close" aria-label="Close Chat">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Chat Message Feed -->
+          <div id="chatbot-messages" class="chatbot-messages-feed"></div>
+
+          <!-- Typing Indicator -->
+          <div id="chat-typing-indicator" class="typing-indicator d-none">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+
+          <!-- Quick Action Chips -->
+          <div class="chatbot-chips-container" id="chatbot-chips">
+            <button class="chat-chip-btn" data-query="What are the recommended pesticides and chemical/organic sprays?">🌿 Recommended Pesticides</button>
+            <button class="chat-chip-btn" data-query="What are the prevention and management steps for this?">🛡️ Prevention Steps</button>
+            <button class="chat-chip-btn" data-query="What caused this and what are the primary symptoms?">❓ Cause & Symptoms</button>
+          </div>
+
+          <!-- Input Footer -->
+          <form id="chatbot-form" class="chatbot-footer-input">
+            <input type="text" id="chatbot-user-input" class="chatbot-text-input" placeholder="Ask about disease, pesticides..." autocomplete="off">
+            <button type="submit" class="chatbot-send-button" aria-label="Send">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <script src="../static/js/bootstrap.bundle.min.js"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          // Jinja2 data injection
+          const activeDisease = "{{ prediction['name'] if prediction else '' }}";
+          const hasPrediction = {{ 'true' if result else 'false' }};
+          
+          const toggleBtn = document.getElementById('chatbot-toggle-btn');
+          const closeBtn = document.getElementById('chatbot-close-btn');
+          const chatWindow = document.getElementById('chatbot-window');
+          const messagesFeed = document.getElementById('chatbot-messages');
+          const chatForm = document.getElementById('chatbot-form');
+          const userInput = document.getElementById('chatbot-user-input');
+          const chipsContainer = document.getElementById('chatbot-chips');
+          const typingIndicator = document.getElementById('chat-typing-indicator');
+          const statusIndicator = document.getElementById('chatbot-status');
+          const chatBadge = document.getElementById('chat-badge');
+          
+          let chatHistory = [];
+          let isInitialized = false;
+
+          // Toggle Chat Window
+          toggleBtn.addEventListener('click', () => {
+            chatWindow.classList.toggle('d-none');
+            chatBadge.style.display = 'none';
+            if (!chatWindow.classList.contains('d-none')) {
+              userInput.focus();
+              if (!isInitialized) {
+                initChat();
+              }
+            }
+          });
+
+          closeBtn.addEventListener('click', () => {
+            chatWindow.classList.add('d-none');
+          });
+
+          // Check API Status (Online/Offline) on load
+          async function checkAIStatus() {
+            try {
+              // Send dummy chat payload just to check config (api key check)
+              const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: 'status_check', disease_name: activeDisease })
+              });
+              const data = await response.json();
+              if (data.mode === 'online') {
+                statusIndicator.innerHTML = '<span class="status-dot online"></span>AI Active (Gemini)';
+              } else {
+                statusIndicator.innerHTML = '<span class="status-dot offline"></span>Offline Helper';
+              }
+            } catch (e) {
+              statusIndicator.innerHTML = '<span class="status-dot offline"></span>Local Mode';
+            }
+          }
+          checkAIStatus();
+
+          // Initialize Chat with Greeting
+          function initChat() {
+            isInitialized = true;
+            messagesFeed.innerHTML = '';
+            
+            let greeting = "";
+            if (hasPrediction && activeDisease) {
+              const cleanDisease = activeDisease.replace(/___/g, ' ').replace(/_/g, ' ');
+              if (cleanDisease.toLowerCase().includes('healthy')) {
+                greeting = `Hi there! I see your **${cleanDisease}**. Excellent job! What general care or preventative steps would you like to discuss today?`;
+                // Hide action chips for healthy plants since they don't need pesticides
+                chipsContainer.style.display = 'none';
+              } else {
+                greeting = `Hello! I see your crop has been diagnosed with **${cleanDisease}**. I am ready to help you treat it.\n\nClick a chip below to view recommended **pesticides**, **prevention plans**, or type any specific questions you have.`;
+                chipsContainer.style.display = 'flex';
+              }
+            } else {
+              greeting = "Hello! Welcome to **Phasal Crop Care**. I can guide you through plant diseases, pesticide selections, and crop protection.\n\n*Please upload a crop leaf image above first to get started with specific advice!*";
+              chipsContainer.style.display = 'none';
+            }
+            
+            appendMessage('assistant', greeting);
+          }
+
+          // Automatically show badge if results have loaded and chatbot hasn't been opened
+          if (hasPrediction) {
+            setTimeout(() => {
+              if (chatWindow.classList.contains('d-none')) {
+                chatBadge.style.display = 'block';
+                // Soft bounce trigger icon to catch attention
+                toggleBtn.classList.add('bounce-animate');
+                setTimeout(() => toggleBtn.classList.remove('bounce-animate'), 2000);
+              }
+            }, 1200);
+          }
+
+          // Clean markdown helper
+          function formatMarkdown(text) {
+            if (!text) return "";
+            // Escape HTML tags to prevent injections
+            let escaped = text
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;");
+            
+            // Bold **text**
+            escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Inline code `code`
+            escaped = escaped.replace(/`(.*?)`/g, '<code>$1</code>');
+            
+            // Headers
+            escaped = escaped.replace(/^###\s*(.*?)$/gm, '<h6 class="chat-h3">$1</h6>');
+            escaped = escaped.replace(/^##\s*(.*?)$/gm, '<h5 class="chat-h2">$1</h5>');
+            escaped = escaped.replace(/^#\s*(.*?)$/gm, '<h4 class="chat-h1">$1</h4>');
+            
+            // Lists (- item or * item)
+            let lines = escaped.split('\n');
+            let inList = false;
+            for (let i = 0; i < lines.length; i++) {
+              let line = lines[i].trim();
+              if (line.startsWith('- ') || line.startsWith('* ')) {
+                let content = line.substring(2);
+                if (!inList) {
+                  lines[i] = '<ul><li>' + content + '</li>';
+                  inList = true;
+                } else {
+                  lines[i] = '<li>' + content + '</li>';
+                }
+              } else {
+                if (inList) {
+                  lines[i - 1] = lines[i - 1] + '</ul>';
+                  inList = false;
+                }
+              }
+            }
+            if (inList) {
+              lines[lines.length - 1] = lines[lines.length - 1] + '</ul>';
+            }
+            
+            return lines.join('\n').replace(/\n/g, '<br>');
+          }
+
+          // Append bubble to feed
+          function appendMessage(role, text) {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('chat-message-wrapper', role === 'user' ? 'user' : 'assistant');
+            
+            const bubble = document.createElement('div');
+            bubble.classList.add('chat-bubble');
+            bubble.innerHTML = formatMarkdown(text);
+            
+            wrapper.appendChild(bubble);
+            messagesFeed.appendChild(wrapper);
+            messagesFeed.scrollTop = messagesFeed.scrollHeight;
+          }
+
+          // Send message routine
+          async function sendMessage(messageText) {
+            if (!messageText.trim()) return;
+            
+            appendMessage('user', messageText);
+            userInput.value = '';
+            
+            // Show typing indicator
+            typingIndicator.classList.remove('d-none');
+            messagesFeed.scrollTop = messagesFeed.scrollHeight;
+            
+            // Construct payload
+            const payload = {
+              message: messageText,
+              disease_name: activeDisease,
+              history: chatHistory
+            };
+            
+            try {
+              const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              
+              if (!response.ok) {
+                throw new Error('API server returned error status');
+              }
+              
+              const data = await response.json();
+              typingIndicator.classList.add('d-none');
+              
+              if (data.response) {
+                appendMessage('assistant', data.response);
+                // Keep history updated
+                chatHistory.push({ role: 'user', content: messageText });
+                chatHistory.push({ role: 'assistant', content: data.response });
+                // Cap history length to avoid excessive payload
+                if (chatHistory.length > 12) {
+                  chatHistory = chatHistory.slice(chatHistory.length - 12);
+                }
+              } else {
+                appendMessage('assistant', "I had trouble processing that request. Please try again.");
+              }
+            } catch (error) {
+              console.error(error);
+              typingIndicator.classList.add('d-none');
+              appendMessage('assistant', "Sorry, I can't reach the agricultural helper service right now. Please ensure the backend server is running correctly.");
+            }
+          }
+
+          // Event listener for user form submit
+          chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = userInput.value;
+            sendMessage(text);
+          });
+
+          // Event listener for action chips
+          chipsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('chat-chip-btn')) {
+              const query = e.target.getAttribute('data-query');
+              sendMessage(query);
+            }
+          });
+        });
+      </script>
+</body>
+</html>

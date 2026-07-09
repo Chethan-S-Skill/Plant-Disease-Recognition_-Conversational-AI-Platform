@@ -1,0 +1,18 @@
+# Local configuration and keys
+.env
+.env.local
+
+# Python caches and environments
+__pycache__/
+*.pyc
+venv/
+.venv/
+env/
+
+# Uploaded/temporary image files
+uploadimages/temp_*
+uploadimages/temp_*.*
+
+# OS specific files
+.DS_Store
+Thumbs.db
