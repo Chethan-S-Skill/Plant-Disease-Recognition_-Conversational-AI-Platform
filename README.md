@@ -1,5 +1,5 @@
-# Plant-Disease-Recognition-System
-Plant Disease Recognition System
+# AI-Powered platform for Plant-Disease-Recognition-System
+AI-Powered platform for Plant-Disease-Recognition-System
 
 # Model Setup Instructions
 
